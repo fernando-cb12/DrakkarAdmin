@@ -58,4 +58,38 @@ const registerVisit = (req, res) => {
     });
 };
 
-module.exports = { getUsers, addUser, registerVisit };
+const checkPaymentStatus = (req, res) => {
+    const { usuario_id } = req.body;
+
+    if (!usuario_id) {
+        return res.status(400).json({ error: 'Falta el ID del usuario' });
+    }
+
+    const query = 'SELECT fecha_pago FROM usuarios WHERE id = ?';
+    db.query(query, [usuario_id], (err, results) => {
+        if (err) {
+            console.error('Error al consultar fecha de pago:', err);
+            return res.status(500).json({ error: 'Error al verificar estado de pago' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        const fechaPago = new Date(results[0].fecha_pago);
+        const fechaActual = new Date();
+        const diferencia = Math.ceil((fechaPago - fechaActual) / (1000 * 60 * 60 * 24)); // Diferencia en días
+
+        if (diferencia >= 0) {
+            res.status(200).json({ 
+                message: `Faltan ${diferencia} días para el próximo pago` 
+            });
+        } else {
+            res.status(200).json({ 
+                message: `El pago está retrasado por ${Math.abs(diferencia)} días` 
+            });
+        }
+    });
+};
+
+module.exports = { getUsers, addUser, registerVisit, checkPaymentStatus };
