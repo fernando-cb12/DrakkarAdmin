@@ -17,3 +17,13 @@ const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
+
+app.get('/test-db', (req, res) => {
+    db.query('SELECT 1 + 1 AS resultado', (err, results) => {
+        if (err) {
+            res.status(500).send('Error al conectar a la base de datos');
+        } else {
+            res.send(`Conexión exitosa: ${results[0].resultado}`);
+        }
+    });
+});
