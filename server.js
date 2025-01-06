@@ -1,10 +1,12 @@
 const express = require('express');
 const db = require('./db/connection');
 const usersRoutes = require('./routes/users'); // Importar rutas de usuarios
+const morgan = require('morgan');
 
 const app = express();
 
 app.use(express.json());
+app.use(morgan('dev'));
 
 // Usar las rutas de usuarios
 app.use('/api/users', usersRoutes);
