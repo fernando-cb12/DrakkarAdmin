@@ -92,4 +92,49 @@ const checkPaymentStatus = (req, res) => {
     });
 };
 
-module.exports = { getUsers, addUser, registerVisit, checkPaymentStatus };
+const getStats = (req, res) => {
+    const totalUsersQuery = 'SELECT COUNT(*) AS total FROM usuarios';
+    const activeUsersQuery = `
+        SELECT COUNT(DISTINCT v.usuario_id) AS active
+        FROM visitas v
+        WHERE v.fecha_visita >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+    `;
+    const inactiveUsersQuery = `
+        SELECT COUNT(*) AS inactive
+        FROM usuarios u
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM visitas v
+            WHERE v.usuario_id = u.id AND v.fecha_visita >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+        ) OR u.fecha_pago < CURDATE()
+    `;
+
+    db.query(totalUsersQuery, (err, totalResult) => {
+        if (err) {
+            console.error('Error al obtener el total de usuarios:', err);
+            return res.status(500).json({ error: 'Error al obtener estadísticas' });
+        }
+
+        db.query(activeUsersQuery, (err, activeResult) => {
+            if (err) {
+                console.error('Error al obtener usuarios activos:', err);
+                return res.status(500).json({ error: 'Error al obtener estadísticas' });
+            }
+
+            db.query(inactiveUsersQuery, (err, inactiveResult) => {
+                if (err) {
+                    console.error('Error al obtener usuarios inactivos:', err);
+                    return res.status(500).json({ error: 'Error al obtener estadísticas' });
+                }
+
+                res.status(200).json({
+                    totalUsers: totalResult[0].total,
+                    activeUsers: activeResult[0].active,
+                    inactiveUsers: inactiveResult[0].inactive,
+                });
+            });
+        });
+    });
+};
+
+module.exports = { getUsers, addUser, registerVisit, checkPaymentStatus, getStats };
