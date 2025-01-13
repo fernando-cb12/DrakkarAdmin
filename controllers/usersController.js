@@ -78,7 +78,7 @@ const checkPaymentStatus = (req, res) => {
 
         const fechaPago = new Date(results[0].fecha_pago);
         const fechaActual = new Date();
-        const diferencia = Math.ceil((fechaPago - fechaActual) / (1000 * 60 * 60 * 24)); // Diferencia en días
+        const diferencia = Math.ceil((fechaPago - fechaActual) / (1000 * 60 * 60 * 24));
 
         if (diferencia >= 0) {
             res.status(200).json({ 
