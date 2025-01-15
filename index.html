@@ -26,16 +26,19 @@
     <div id="login_menu">
         <div id="login">
             <div id="user_image"></div>
-            <div id="login_container"> 
-                <input type="email" placeholder="Enter your user"> 
-            </div>
-            <div id="login_container">
-                <input type="password" placeholder="Enter your password"> 
-            </div>
-            <div id="login_container">
-                <input id="login_button" type="submit" value="Login">
-            </div>
+            <form id="loginForm">
+                <div id="login_container">
+                    <input type="text" id="user" placeholder="Enter your user" name="username" required>
+                </div>
+                <div id="login_container">
+                    <input type="password" id="password" placeholder="Enter your password" name="password" required>
+                </div>
+                <div id="login_container">
+                    <input id="login_button" type="submit" value="Login">
+                </div>
+            </form>
         </div>
     </div>
+    <script src="script.js"></script>
 </body>
 </html>

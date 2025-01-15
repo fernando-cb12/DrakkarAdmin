@@ -1,4 +1,5 @@
 const db = require('../db/connection');
+const bcrypt = require('bcrypt');
 
 const getUsers = (req, res) => {
     db.query('SELECT * FROM usuarios', (err, results) => {
@@ -137,4 +138,34 @@ const getStats = (req, res) => {
     });
 };
 
-module.exports = { getUsers, addUser, registerVisit, checkPaymentStatus, getStats };
+const loginAdmin = (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).json({ error: 'Faltan datos obligatorios' });
+    }
+
+    const query = 'SELECT * FROM admin WHERE usuario = ?';
+    db.query(query, [username], (err, results) => {
+        if (err) {
+            console.error('Error al autenticar administrador:', err);
+            return res.status(500).json({ error: 'Error en el servidor' });
+        }
+
+        if (results.length === 0) {
+            return res.status(401).json({ error: 'Credenciales incorrectas' });
+        }
+
+        const admin = results[0];
+        bcrypt.compare(password, admin.contraseña, (err, isMatch) => {
+            if (err || !isMatch) {
+                return res.status(401).json({ error: 'Credenciales incorrectas' });
+            }
+
+            res.status(200).json({ message: 'Inicio de sesión exitoso', token: 'fake-jwt-token' });
+        });
+    });
+};
+
+module.exports = { getUsers, addUser, registerVisit, checkPaymentStatus, getStats, loginAdmin };
+
