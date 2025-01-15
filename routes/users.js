@@ -7,7 +7,7 @@ router.post('/', addUser);
 router.post('/visits', registerVisit);
 router.post('/payments/check', checkPaymentStatus);
 router.get('/stats', getStats);
-router.post('/admin/login', loginAdmin); 
+router.post('/login', loginAdmin); 
 
 
 
